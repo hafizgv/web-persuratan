@@ -152,11 +152,11 @@ $html = '
                 </tr>
             </tbody>
         </table>
-        <span style="margin-top: 16pt;">
+        <div style="margin-top: 8pt;">
             Nama tersebut adalah benar warga Desa Terong Tawah, Kecamatan Labuapi, Kabupaten Lombok Barat.
             Berdasarkan keterangan yang ada pada kami benar bahwa Surat Keterangan ini dibuat untuk <b>Beasiswa.</b>
-        </span><br>
-        <div style="margin-top: 18pt;">
+        </div><br>
+        <div>
             Demikian surat keterangan ini dibuat, atas perhatian dan kerjasamanya kami ucapkan terima kasih.
         </div>
         <table style="text-align: center; width: 100%; margin-top: 18pt;">
@@ -188,4 +188,7 @@ $pdfPath = 'result.pdf';
 $mpdf->Output($pdfPath, \Mpdf\Output\Destination::FILE);
 
 echo "PDF has been saved to " . $pdfPath;
+
+header("Location: index.php");
+exit();
 ?>
