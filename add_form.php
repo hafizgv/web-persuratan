@@ -69,7 +69,7 @@
 <body>
     <div class="container">
         <h2>Form Input Surat</h2>
-        <form action="convert.php" method="POST">
+        <form action="process_data.php" method="POST">
             <label for="nama">Nama:</label>
             <input type="text" id="nama" name="nama" required>
             
