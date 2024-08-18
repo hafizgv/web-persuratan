@@ -8,46 +8,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Ambil ID surat dari URL
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$jenis_surat = isset($_GET['jenis']) ? $_GET['jenis'] : '';
-
-if ($jenis_surat === 'masuk') {
-    $query = "SELECT * FROM surat_masuk WHERE id = $id";
-} else {
-    $query = "SELECT * FROM surat_keluar WHERE id = $id";
-}
-
-$result = mysqli_query($conn, $query);
-$surat = mysqli_fetch_assoc($result);
-
-if (!$surat) {
-    echo "Surat tidak ditemukan.";
-    exit();
-}
-
-// Proses update surat
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nomor_surat = mysqli_real_escape_string($conn, $_POST['nomor_surat']);
-    $perihal = mysqli_real_escape_string($conn, $_POST['perihal']);
-    $penerima_pengirim = mysqli_real_escape_string($conn, $_POST['penerima_pengirim']);
-    $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
-    $tanggal_surat = mysqli_real_escape_string($conn, $_POST['tanggal_surat']);
-    $ringkasan = mysqli_real_escape_string($conn, $_POST['ringkasan']);
-
-    if ($jenis_surat === 'masuk') {
-        $update_query = "UPDATE surat_masuk SET nomor_surat='$nomor_surat', perihal='$perihal', pengirim='$penerima_pengirim', tanggal_surat='$tanggal_surat', ringkasan='$ringkasan' WHERE id=$id";
-    } else {
-        $update_query = "UPDATE surat_keluar SET nomor_surat='$nomor_surat', perihal='$perihal', penerima='$penerima_pengirim', tanggal_kirim='$tanggal', tanggal_surat='$tanggal_surat', ringkasan='$ringkasan' WHERE id=$id";
-    }
-
-    if (mysqli_query($conn, $update_query)) {
-        header("Location: detail_surat.php?id=$id&jenis=$jenis_surat");
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($conn);
-    }
-}
+// Ambil data jenis surat dari database
+$sql = "SELECT id, nama_surat FROM jenis_surat";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Surat</title>
+    <title>Surat Keterangan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -175,22 +138,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .actions a:hover {
             color: #007bff;
         }
-        .btn-back {
-            font-size: 13px;
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .btn-back:hover {
+        .card-container a {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            flex: 1 1 calc(33.333% - 40px); /* Adjust the width based on container space */
+            box-sizing: border-box;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .card-container a:hover {
             background-color: #0056b3;
         }
-
     </style>
 </head>
 <body>
@@ -205,39 +174,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="content">
             <div class="card">
-                <h3>Edit Surat <?php echo ucfirst($jenis_surat); ?></h3>
-                <form method="POST">
-                    <div class="form-group">
-                        <label for="nomor_surat">Nomor Surat</label>
-                        <input type="text" id="nomor_surat" name="nomor_surat" value="<?php echo $surat['nomor_surat']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="perihal">Perihal</label>
-                        <input type="text" id="perihal" name="perihal" value="<?php echo $surat['perihal']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="penerima_pengirim"><?php echo $jenis_surat === 'masuk' ? 'Pengirim' : 'Penerima'; ?></label>
-                        <input type="text" id="penerima_pengirim" name="penerima_pengirim" value="<?php echo $jenis_surat === 'masuk' ? $surat['pengirim'] : $surat['penerima']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tanggal"><?php echo $jenis_surat === 'masuk' ? 'Tanggal Terima' : 'Tanggal Kirim'; ?></label>
-                        <input type="date" id="tanggal" name="tanggal" value="<?php echo $jenis_surat === 'masuk' ? $surat['tanggal_surat'] : $surat['tanggal_kirim']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tanggal_surat">Tanggal Surat</label>
-                        <input type="date" id="tanggal_surat" name="tanggal_surat" value="<?php echo $surat['tanggal_surat']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ringkasan">Ringkasan</label>
-                        <textarea id="ringkasan" name="ringkasan" rows="3" required><?php echo $surat['ringkasan']; ?></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="lampiran">Lampiran Surat (PDF)</label>
-                        <input type="file" id="lampiran" name="lampiran" accept=".pdf">
-                    </div>
-                    <button type="submit">Update Surat</button>
-                    <a href="<?php echo $jenis_surat == 'masuk' ? 'surat_masuk.php' : 'surat_keluar.php'; ?>" class="btn-back">Kembali ke <?php echo $jenis_surat == 'masuk' ? 'Surat Masuk' : 'Surat Keluar'; ?></a>
-                </form>
+                <h3>Pilih Jenis Surat yang Ingin Anda Buat:</h3>
+                <div class="card-container">
+                    <?php while ($row = $result->fetch_assoc()) : ?>
+                        <a href="admin_buat_surat.php?type=<?= $row['id'] ?>"><?= htmlspecialchars($row['nama_surat']) ?></a>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+
+            <!-- Bagian List Surat -->
+            <div class="card table-container">
+                <h3>List Surat Keterangan</h3>
+                <?php
+                $query = "SELECT sk.id, js.nama_surat, sk.file_lampiran FROM surat_keterangan sk JOIN jenis_surat js ON sk.jenis_surat_id = js.id";
+                $result = $conn->query($query);
+                ?>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Surat</th>
+                            <th>Lampiran</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($result->num_rows > 0): ?>
+                            <?php $no = 1; ?>
+                            <?php while($row = $result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= $no++; ?></td>
+                                    <td><?= htmlspecialchars($row['nama_surat']); ?></td>
+                                    <td><a href="<?= htmlspecialchars($row['file_lampiran']); ?>" target="_blank">Lihat Lampiran</a></td>
+                                    <td><a href="delete_surat.php?id=<?php echo $row['id']; ?>&jenis=keterangan&redirect=surat_keterangan.php" onclick="return confirm('Anda yakin ingin menghapus surat ini?')"><i class="fa-solid fa-trash"></i></a></td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4">Belum ada surat yang dibuat.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

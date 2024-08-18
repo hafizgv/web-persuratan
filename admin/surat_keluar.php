@@ -8,44 +8,37 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Ambil ID surat dari URL
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$jenis_surat = isset($_GET['jenis']) ? $_GET['jenis'] : '';
-
-if ($jenis_surat === 'masuk') {
-    $query = "SELECT * FROM surat_masuk WHERE id = $id";
-} else {
-    $query = "SELECT * FROM surat_keluar WHERE id = $id";
-}
-
+// Ambil data surat keluar dari database
+$query = "SELECT * FROM surat_keluar";
 $result = mysqli_query($conn, $query);
-$surat = mysqli_fetch_assoc($result);
 
-if (!$surat) {
-    echo "Surat tidak ditemukan.";
-    exit();
-}
-
-// Proses update surat
+// Proses penambahan surat keluar
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor_surat = mysqli_real_escape_string($conn, $_POST['nomor_surat']);
     $perihal = mysqli_real_escape_string($conn, $_POST['perihal']);
-    $penerima_pengirim = mysqli_real_escape_string($conn, $_POST['penerima_pengirim']);
-    $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
+    $penerima = mysqli_real_escape_string($conn, $_POST['penerima']);
     $tanggal_surat = mysqli_real_escape_string($conn, $_POST['tanggal_surat']);
+    $tanggal_kirim = mysqli_real_escape_string($conn, $_POST['tanggal_kirim']);
     $ringkasan = mysqli_real_escape_string($conn, $_POST['ringkasan']);
 
-    if ($jenis_surat === 'masuk') {
-        $update_query = "UPDATE surat_masuk SET nomor_surat='$nomor_surat', perihal='$perihal', pengirim='$penerima_pengirim', tanggal_surat='$tanggal_surat', ringkasan='$ringkasan' WHERE id=$id";
-    } else {
-        $update_query = "UPDATE surat_keluar SET nomor_surat='$nomor_surat', perihal='$perihal', penerima='$penerima_pengirim', tanggal_kirim='$tanggal', tanggal_surat='$tanggal_surat', ringkasan='$ringkasan' WHERE id=$id";
-    }
+    // Proses upload lampiran
+    if (isset($_FILES['lampiran']) && $_FILES['lampiran']['error'] == 0) {
+        $lampiran = $_FILES['lampiran']['name'];
+        $target_dir = "../uploads/";
+        $target_file = $target_dir . basename($lampiran);
 
-    if (mysqli_query($conn, $update_query)) {
-        header("Location: detail_surat.php?id=$id&jenis=$jenis_surat");
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($conn);
+        if (move_uploaded_file($_FILES['lampiran']['tmp_name'], $target_file)) {
+            // Insert data ke database
+            $insert_query = "INSERT INTO surat_keluar (nomor_surat, perihal, penerima, tanggal_surat, tanggal_kirim, lampiran, ringkasan) 
+                             VALUES ('$nomor_surat', '$perihal', '$penerima', '$tanggal_surat', '$tanggal_kirim', '$lampiran', '$ringkasan')";
+
+            if (mysqli_query($conn, $insert_query)) {
+                header('Location: surat_keluar.php');
+                exit();
+            } else {
+                echo "Error: " . mysqli_error($conn);
+            }
+        }
     }
 }
 ?>
@@ -55,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Surat</title>
+    <title>Surat Keluar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -175,22 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .actions a:hover {
             color: #007bff;
         }
-        .btn-back {
-            font-size: 13px;
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-
     </style>
 </head>
 <body>
@@ -205,39 +182,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="content">
             <div class="card">
-                <h3>Edit Surat <?php echo ucfirst($jenis_surat); ?></h3>
-                <form method="POST">
+                <h3>Tambah Surat Keluar</h3>
+                <form method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="nomor_surat">Nomor Surat</label>
-                        <input type="text" id="nomor_surat" name="nomor_surat" value="<?php echo $surat['nomor_surat']; ?>" required>
+                        <input type="text" id="nomor_surat" name="nomor_surat" required>
                     </div>
                     <div class="form-group">
                         <label for="perihal">Perihal</label>
-                        <input type="text" id="perihal" name="perihal" value="<?php echo $surat['perihal']; ?>" required>
+                        <input type="text" id="perihal" name="perihal" required>
                     </div>
                     <div class="form-group">
-                        <label for="penerima_pengirim"><?php echo $jenis_surat === 'masuk' ? 'Pengirim' : 'Penerima'; ?></label>
-                        <input type="text" id="penerima_pengirim" name="penerima_pengirim" value="<?php echo $jenis_surat === 'masuk' ? $surat['pengirim'] : $surat['penerima']; ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tanggal"><?php echo $jenis_surat === 'masuk' ? 'Tanggal Terima' : 'Tanggal Kirim'; ?></label>
-                        <input type="date" id="tanggal" name="tanggal" value="<?php echo $jenis_surat === 'masuk' ? $surat['tanggal_surat'] : $surat['tanggal_kirim']; ?>" required>
+                        <label for="penerima">Penerima</label>
+                        <input type="text" id="penerima" name="penerima" required>
                     </div>
                     <div class="form-group">
                         <label for="tanggal_surat">Tanggal Surat</label>
-                        <input type="date" id="tanggal_surat" name="tanggal_surat" value="<?php echo $surat['tanggal_surat']; ?>" required>
+                        <input type="date" id="tanggal_surat" name="tanggal_surat" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tanggal_kirim">Tanggal Kirim</label>
+                        <input type="date" id="tanggal_kirim" name="tanggal_kirim" required>
                     </div>
                     <div class="form-group">
                         <label for="ringkasan">Ringkasan</label>
-                        <textarea id="ringkasan" name="ringkasan" rows="3" required><?php echo $surat['ringkasan']; ?></textarea>
+                        <textarea id="ringkasan" name="ringkasan" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="lampiran">Lampiran Surat (PDF)</label>
-                        <input type="file" id="lampiran" name="lampiran" accept=".pdf">
+                        <input type="file" id="lampiran" name="lampiran" accept="application/pdf" required>
                     </div>
-                    <button type="submit">Update Surat</button>
-                    <a href="<?php echo $jenis_surat == 'masuk' ? 'surat_masuk.php' : 'surat_keluar.php'; ?>" class="btn-back">Kembali ke <?php echo $jenis_surat == 'masuk' ? 'Surat Masuk' : 'Surat Keluar'; ?></a>
+                    <button type="submit">Tambah Surat</button>
                 </form>
+            </div>
+
+            <div class="card table-container">
+                <h3>List Surat Keluar</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nomor Surat</th>
+                            <th>Perihal</th>
+                            <th>Penerima</th>
+                            <th>Tanggal Surat</th>
+                            <th>Tanggal Kirim</th>
+                            <th>Ringkasan</th>
+                            <th>Lampiran</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                            <tr>
+                                <td><?php echo $row['nomor_surat']; ?></td>
+                                <td><?php echo $row['perihal']; ?></td>
+                                <td><?php echo $row['penerima']; ?></td>
+                                <td><?php echo $row['tanggal_surat']; ?></td>
+                                <td><?php echo $row['tanggal_kirim']; ?></td>
+                                <td><?php echo $row['ringkasan']; ?></td>
+                                <td><a href="../uploads/<?php echo $row['lampiran']; ?>" target="_blank">Lihat Lampiran</a></td>
+                                <td class="actions">
+                                    <a href="edit_surat.php?id=<?php echo $row['id']; ?>&jenis=keluar"><i class="fa-solid fa-edit"></i></a>
+                                    <a href="delete_surat.php?id=<?php echo $row['id']; ?>&jenis=keluar&redirect=surat_keluar.php" onclick="return confirm('Anda yakin ingin menghapus surat ini?')"><i class="fa-solid fa-trash"></i></a>
+                                    <a href="detail_surat.php?id=<?php echo $row['id']; ?>&jenis=keluar"><i class="fa-solid fa-eye"></i></a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

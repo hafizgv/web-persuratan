@@ -100,7 +100,7 @@ $result = $conn->query($sql);
     <header>
         <h1>Website Pembuatan Surat Otomatis</h1>
         <div class="login-admin">
-            <a href="admin/login.php">Admin</a>
+            <a href="auth/login.php">Login</a>
         </div>
     </header>
 

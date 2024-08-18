@@ -1,38 +1,34 @@
 <?php
 session_start();
+require_once '../config/connection.php';
 
-// Cek apakah admin sudah login
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
+// Cek apakah pengguna sudah login sebagai admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../auth/login.php');
+    exit();
 }
 
-require_once '../config/connection.php'; // File konfigurasi untuk koneksi database
+// Ambil ID surat dan jenis surat dari URL
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$jenis_surat = isset($_GET['jenis']) ? $_GET['jenis'] : '';
 
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+// Tentukan query berdasarkan jenis surat
+if ($jenis_surat === 'masuk') {
+    $query = "SELECT * FROM surat_masuk WHERE id = $id";
+} elseif ($jenis_surat === 'keluar') {
+    $query = "SELECT * FROM surat_keluar WHERE id = $id";
+} else {
+    echo "Jenis surat tidak valid!";
+    exit();
 }
 
-$id = $_GET['id'] ?? null;
+$result = mysqli_query($conn, $query);
+$surat = mysqli_fetch_assoc($result);
 
-if (!$id) {
-    echo "ID surat tidak ditemukan.";
-    exit;
+if (!$surat) {
+    echo "Surat tidak ditemukan!";
+    exit();
 }
-
-// Ambil data surat berdasarkan ID
-$sql = "SELECT * FROM surat WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows === 0) {
-    echo "Surat tidak ditemukan.";
-    exit;
-}
-
-$row = $result->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
@@ -43,186 +39,153 @@ $row = $result->fetch_assoc();
     <title>Detail Surat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Gunakan style yang sama seperti pada dashboard */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px;
+            background-color: #f4f7f6;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
-
-        header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .logout-btn {
-            margin-right: 20px;
-        }
-
-        .logout-btn a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border: 2px solid white;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .logout-btn a:hover {
-            background-color: white;
-            color: #333;
-        }
-
         .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 30px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            width: 100%;
         }
-
-        h2 {
-            color: #333;
+        .sidebar {
+            width: 250px;
+            background-color: #e0f2f1;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            color: #004d40;
+            font-size: 24px;
+            margin: 0;
+        }
+        .sidebar a {
+            display: block;
+            color: #004d40;
+            text-decoration: none;
+            padding: 10px;
+            font-size: 18px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar a:hover {
+            background-color: #b2dfdb;
+        }
+        .content {
+            margin-left: 295px;
+            padding: 20px;
+            width: calc(100% - 270px);
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             margin-bottom: 20px;
         }
-
-        form {
-            display: flex;
-            flex-direction: column;
+        .card h3 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
         }
-
-        label {
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input, textarea {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
-
-        table {
+        .card table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
-
-        table th, table td {
-            padding: 10px;
+        .card table th,
+        .card table td {
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-            word-wrap: break-word; /* Memastikan teks panjang dibungkus ke baris baru */
         }
-
-        table th {
-            background-color: #f8f8f8;
+        .card table th {
+            background-color: #f7f7f7;
         }
-
-        table tr:hover {
+        .card table tr:hover {
             background-color: #f1f1f1;
         }
-
-        table td.ringkasan {
-            max-width: 200px; /* Atur sesuai kebutuhan */
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #333;
+        .btn-back {
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
             color: #fff;
-            margin-top: 40px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
 
-        label i {
-            margin-right: 8px; /* Jarak antara ikon dan teks label */
-        }
-
-        h2 i {
-            margin-right: 8px; /* Jarak antara ikon dan teks h2 */
-        }
-
-        .aksi {
-            display: flex;
-            gap: 10px;
+        .btn-back:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Detail Surat</h1>
-        <div class="logout-btn">
-            <a href="logout.php">Logout</a>
-        </div>
-    </header>
-
     <div class="container">
-        <h2><i class="fas fa-eye"></i> Detail Surat</h2>
-        <table>
-            <tr>
-                <th>Nomor Surat</th>
-                <td><?php echo htmlspecialchars($row['nomor_surat']); ?></td>
-            </tr>
-            <tr>
-                <th>Perihal</th>
-                <td><?php echo htmlspecialchars($row['perihal']); ?></td>
-            </tr>
-            <tr>
-                <th>Pengirim</th>
-                <td><?php echo htmlspecialchars($row['pengirim']); ?></td>
-            </tr>
-            <tr>
-                <th>Tanggal Surat</th>
-                <td><?php echo htmlspecialchars($row['tanggal_surat']); ?></td>
-            </tr>
-            <tr>
-                <th>Tanggal Terima/Kirim</th>
-                <td><?php echo htmlspecialchars($row['tanggal_terima']); ?></td>
-            </tr>
-            <tr>
-                <th>Ringkasan Isi Surat</th>
-                <td><?php echo nl2br(htmlspecialchars($row['ringkasan_surat'])); ?></td>
-            </tr>
-            <tr>
-                <th>Lampiran</th>
-                <td><a href="<?php echo htmlspecialchars($row['file_path']); ?>" target="_blank">Lihat Lampiran</a></td>
-            </tr>
-        </table>
-        <a href="dashboard.php" class="button"><i class="fas fa-arrow-left"></i> Kembali</a>
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="dashboard.php"><i class="fa-solid fa-tachometer-alt"></i> Home</a>
+            <a href="surat_masuk.php"><i class="fa-solid fa-inbox"></i> Surat Masuk</a>
+            <a href="surat_keluar.php"><i class="fa-solid fa-envelope"></i> Surat Keluar</a>
+            <a href="surat_keterangan.php"><i class="fa-solid fa-file-alt"></i> Surat Keterangan</a>
+            <a href="../auth/logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+        </div>
+        <div class="content">
+            <div class="card">
+                <h3>Detail Surat <?php echo ucfirst($jenis_surat); ?></h3>
+                <table>
+                    <tr>
+                        <th>Nomor Surat</th>
+                        <td><?php echo htmlspecialchars($surat['nomor_surat']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Perihal</th>
+                        <td><?php echo htmlspecialchars($surat['perihal']); ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo ($jenis_surat === 'masuk') ? 'Pengirim' : 'Penerima'; ?></th>
+                        <td><?php echo htmlspecialchars($surat[($jenis_surat === 'masuk') ? 'pengirim' : 'penerima']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Surat</th>
+                        <td><?php echo htmlspecialchars($surat['tanggal_surat']); ?></td>
+                    </tr>
+                    <tr>
+                        <th><?php echo ($jenis_surat === 'masuk') ? 'Tanggal Terima' : 'Tanggal Kirim'; ?></th>
+                        <td><?php echo htmlspecialchars($surat[($jenis_surat === 'masuk') ? 'tanggal_terima' : 'tanggal_kirim']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Ringkasan</th>
+                        <td><?php echo htmlspecialchars($surat['ringkasan']); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Lampiran</th>
+                        <td>
+                            <?php if ($surat['lampiran']) : ?>
+                                <a href="../uploads/<?php echo htmlspecialchars($surat['lampiran']); ?>" target="_blank">Lihat Lampiran</a>
+                            <?php else: ?>
+                                Tidak ada lampiran
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                </table>
+                <a href="<?php echo $jenis_surat == 'masuk' ? 'surat_masuk.php' : 'surat_keluar.php'; ?>" class="btn-back">Kembali ke <?php echo $jenis_surat == 'masuk' ? 'Surat Masuk' : 'Surat Keluar'; ?></a>
+            </div>
+        </div>
     </div>
-
-    <footer>
-        <p>&copy; 2024 Dashboard Admin. All rights reserved.</p>
-    </footer>
 </body>
 </html>
