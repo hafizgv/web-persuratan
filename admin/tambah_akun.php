@@ -1,16 +1,18 @@
 <?php
-session_start();
 require_once '../config/connection.php';
 
-// Cek apakah pengguna sudah login sebagai admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../auth/login.php');
-    exit();
-}
+$success = false;
 
-// Ambil data jenis surat dari database
-$sql = "SELECT id, nama_surat FROM jenis_surat";
-$result = $conn->query($sql);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = $_POST['role'];
+
+    $query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "sss", $username, $password, $role);
+    $success = mysqli_stmt_execute($stmt);
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +20,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Keterangan</title>
+    <title>Tambah Akun</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -176,49 +178,24 @@ $result = $conn->query($sql);
         </div>
         <div class="content">
             <div class="card">
-                <h3>Pilih Jenis Surat yang Ingin Anda Buat:</h3>
-                <div class="card-container">
-                    <?php while ($row = $result->fetch_assoc()) : ?>
-                        <a href="admin_buat_surat.php?type=<?= $row['id'] ?>"><?= htmlspecialchars($row['nama_surat']) ?></a>
-                    <?php endwhile; ?>
-                </div>
-            </div>
-
-            <!-- Bagian List Surat -->
-            <div class="card table-container">
-                <h3>List Surat Keterangan</h3>
-                <?php
-                $query = "SELECT sk.id, js.nama_surat, sk.file_lampiran FROM surat_keterangan sk JOIN jenis_surat js ON sk.jenis_surat_id = js.id";
-                $result = $conn->query($query);
-                ?>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Surat</th>
-                            <th>Lampiran</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result->num_rows > 0): ?>
-                            <?php $no = 1; ?>
-                            <?php while($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= $no++; ?></td>
-                                    <td><?= htmlspecialchars($row['nama_surat']); ?></td>
-                                    <td><a href="<?= htmlspecialchars($row['file_lampiran']); ?>" target="_blank">Lihat Lampiran</a></td>
-                                    <td><a href="delete_surat.php?id=<?php echo $row['id']; ?>&jenis=keterangan&redirect=surat_keterangan.php" onclick="return confirm('Anda yakin ingin menghapus surat ini?')"><i class="fa-solid fa-trash"></i></a></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4">Belum ada surat yang dibuat.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                <h2>Tambah Akun Baru</h2>
+                <?php if ($success): ?>
+                    <div class="success">
+                        <p>Akun berhasil ditambahkan!</p>
+                    </div>
+                <?php endif; ?>
+                <form method="POST">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="admin">Admin</option>
+                        <option value="guest">Guest</option>
+                    </select>
+                    <button type="submit">Tambah Akun</button>
+                </form>
             </div>
         </div>
     </div>

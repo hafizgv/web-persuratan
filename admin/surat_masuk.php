@@ -176,6 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="surat_masuk.php"><i class="fa-solid fa-inbox"></i> Surat Masuk</a>
             <a href="surat_keluar.php"><i class="fa-solid fa-envelope"></i> Surat Keluar</a>
             <a href="surat_keterangan.php"><i class="fa-solid fa-file-alt"></i> Surat Keterangan</a>
+            <a href="tambah_akun.php"><i class="fa-solid fa-user-plus"></i> Tambah Akun</a>
+            <a href="lihat_akun.php"><i class="fa-solid fa-users"></i> Lihat Akun</a>
             <a href="../auth/logout.php"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
         </div>
         <div class="content">

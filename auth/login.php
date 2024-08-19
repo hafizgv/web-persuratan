@@ -106,6 +106,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             margin-bottom: 15px;
         }
+        .back-home {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .back-home a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .back-home a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -126,6 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="form-group">
             <button type="submit">Login</button>
+        </div>
+        <div class="back-home">
+            <a href="../index.php">Kembali ke Halaman Utama</a>
         </div>
     </form>
 </div>

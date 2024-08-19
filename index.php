@@ -21,8 +21,8 @@ $result = $conn->query($sql);
         }
 
         header {
-            background-color: #333;
-            color: white;
+            background-color: #e0f2f1;
+            color: #004d40;
             padding: 20px;
             display: flex;
             justify-content: space-between;
@@ -39,17 +39,17 @@ $result = $conn->query($sql);
         }
 
         .login-admin a {
-            color: white;
+            color: #004d40;
             text-decoration: none;
             padding: 10px 20px;
-            border: 2px solid white;
+            border: 2px solid #004d40;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
         }
 
         .login-admin a:hover {
-            background-color: white;
-            color: #333;
+            background-color: #b2dfdb;
+            color: #004d40;
         }
 
         main {
@@ -86,8 +86,8 @@ $result = $conn->query($sql);
         }
 
         footer {
-            background-color: #333;
-            color: white;
+            background-color: #e0f2f1;
+            color: #004d40;
             text-align: center;
             padding: 10px;
             position: fixed;

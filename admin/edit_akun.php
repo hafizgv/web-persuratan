@@ -1,16 +1,43 @@
 <?php
-session_start();
 require_once '../config/connection.php';
 
-// Cek apakah pengguna sudah login sebagai admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../auth/login.php');
-    exit();
+if (!isset($_GET['id'])) {
+    die("ID akun tidak disediakan.");
 }
 
-// Ambil data jenis surat dari database
-$sql = "SELECT id, nama_surat FROM jenis_surat";
-$result = $conn->query($sql);
+$id = $_GET['id'];
+$success = false;
+
+// Ambil data akun berdasarkan ID
+$query = "SELECT username, role FROM users WHERE id = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$akun = mysqli_fetch_assoc($result);
+
+if (!$akun) {
+    die("Akun tidak ditemukan.");
+}
+
+// Tangani form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $role = $_POST['role'];
+
+    if (!empty($_POST['password'])) {
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $query = "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "sssi", $username, $password, $role, $id);
+    } else {
+        $query = "UPDATE users SET username = ?, role = ? WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "ssi", $username, $role, $id);
+    }
+
+    $success = mysqli_stmt_execute($stmt);
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +45,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Keterangan</title>
+    <title>Edit Akun</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -160,6 +187,21 @@ $result = $conn->query($sql);
         .card-container a:hover {
             background-color: #0056b3;
         }
+        .btn-back {
+            font-size: 13px;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -176,49 +218,31 @@ $result = $conn->query($sql);
         </div>
         <div class="content">
             <div class="card">
-                <h3>Pilih Jenis Surat yang Ingin Anda Buat:</h3>
-                <div class="card-container">
-                    <?php while ($row = $result->fetch_assoc()) : ?>
-                        <a href="admin_buat_surat.php?type=<?= $row['id'] ?>"><?= htmlspecialchars($row['nama_surat']) ?></a>
-                    <?php endwhile; ?>
-                </div>
-            </div>
-
-            <!-- Bagian List Surat -->
-            <div class="card table-container">
-                <h3>List Surat Keterangan</h3>
-                <?php
-                $query = "SELECT sk.id, js.nama_surat, sk.file_lampiran FROM surat_keterangan sk JOIN jenis_surat js ON sk.jenis_surat_id = js.id";
-                $result = $conn->query($query);
-                ?>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Surat</th>
-                            <th>Lampiran</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($result->num_rows > 0): ?>
-                            <?php $no = 1; ?>
-                            <?php while($row = $result->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= $no++; ?></td>
-                                    <td><?= htmlspecialchars($row['nama_surat']); ?></td>
-                                    <td><a href="<?= htmlspecialchars($row['file_lampiran']); ?>" target="_blank">Lihat Lampiran</a></td>
-                                    <td><a href="delete_surat.php?id=<?php echo $row['id']; ?>&jenis=keterangan&redirect=surat_keterangan.php" onclick="return confirm('Anda yakin ingin menghapus surat ini?')"><i class="fa-solid fa-trash"></i></a></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4">Belum ada surat yang dibuat.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                <h2>Edit Akun - <?php echo htmlspecialchars($akun['username']); ?></h2>
+                <?php if ($success): ?>
+                    <div class="success">
+                        <p>Akun berhasil diperbarui!</p>
+                    </div>
+                <?php endif; ?>
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($akun['username']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password (Biarkan kosong jika tidak ingin mengubah):</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <div class="form-group">
+                    <label for="role">Role:</label>
+                        <select id="role" name="role" required>
+                            <option value="admin" <?php echo $akun['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                            <option value="guest" <?php echo $akun['role'] == 'guest' ? 'selected' : ''; ?>>Guest</option>
+                        </select>
+                    </div>
+                    <button type="submit">Perbarui Akun</button>
+                </form>
+                <a class="btn-back" href="lihat_akun.php">Kembali ke Daftar Akun</a>
             </div>
         </div>
     </div>

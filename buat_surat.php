@@ -21,7 +21,7 @@ if (!$surat) {
     die("Jenis surat tidak ditemukan.");
 }
 
-$template_file = $surat['template_file'];
+$template_file = '/templates' . $surat['template_file'];
 $required_fields = explode(',', $surat['required_fields']);
 $success = false;
 
@@ -43,11 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mpdf->WriteHTML($html);
 
     $filename = $surat['nama_surat'] . "_" . time() . ".pdf";
-    $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
+    $file_path = '/uploads' . $filename;
+    $mpdf->Output($file_path, \Mpdf\Output\Destination::FILE);
 
+    // Simpan informasi file ke database
+    $insert_query = "INSERT INTO surat_keterangan (jenis_surat_id, nama_surat, file_lampiran, created_at) VALUES (?, ?, ?, NOW())";
+    $stmt = mysqli_prepare($conn, $insert_query);
+
+    if (!$stmt) {
+        die("Error preparing insert statement: " . mysqli_error($conn));
+    }
+
+    mysqli_stmt_bind_param($stmt, "iss", $jenis_surat_id, $surat['nama_surat'], $file_path);
+    if (!mysqli_stmt_execute($stmt)) {
+        die("Error executing insert statement: " . mysqli_stmt_error($stmt));
+    }
     $success = true;
 }
-
 ?>
 
 
