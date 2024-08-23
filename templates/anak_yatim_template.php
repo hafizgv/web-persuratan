@@ -3,7 +3,7 @@
         <tbody>
             <tr>
                 <td>
-                    <img src="img/acehtimur.png" width="90" alt="logo">
+                    <img src="../img/acehtimur.png" width="90" alt="logo">
                 </td>
                 <td>
                     <span style="font-size: 14pt; font-weight: bold;">

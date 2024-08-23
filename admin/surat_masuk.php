@@ -58,9 +58,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
             overflow: auto;
         }
+        .header {
+            background-color: #e0f2f1;
+            color: #004d40;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 24px;
+            position: fixed;
+            width: calc(100% - 250px); /* Mengurangi lebar sidebar */
+            top: 0;
+            left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
+            z-index: 500;
+            border-bottom: 2px solid #ccc;
+        }
         .container {
             display: flex;
             width: 100%;
+            margin-top: 60px;
         }
         .sidebar {
             width: 250px;
@@ -70,13 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
+            bottom: 0;
             overflow-y: auto;
+            z-index: 1000;
+            border-right: 2px solid #ccc;
         }
         .sidebar h2 {
             color: #004d40;
             font-size: 24px;
-            margin: 0;
+            margin: 0 0 1.9rem 1rem;
         }
         .sidebar a {
             display: block;
@@ -93,11 +109,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .content {
             margin-left: 295px;
+            margin-top: 20px;
             padding: 20px;
             width: calc(100% - 270px);
-            overflow-y: auto; /* Tambahkan ini agar konten dapat digulir */
-            height: 100vh; /* Pastikan content memakan penuh tinggi halaman */
-            box-sizing: border-box; /* Pastikan padding tidak menambah lebar elemen */
+            overflow-y: auto;
+            height: 100vh;
+            box-sizing: border-box;
         }
         .card {
             background-color: #fff;
@@ -142,6 +159,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .table-container {
             margin-top: 20px;
         }
+        .table-container form {
+            margin-bottom: 20px;
+        }
+        .table-container form select {
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
         .table-container table {
             width: 100%;
             border-collapse: collapse;
@@ -166,9 +193,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .actions a:hover {
             color: #007bff;
         }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card-container a {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            flex: 1 1 calc(33.333% - 40px); /* Adjust the width based on container space */
+            box-sizing: border-box;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .card-container a:hover {
+            background-color: #0056b3;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .pagination a.active {
+            background-color: #333;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
+    <div class="header">
+        <b>Sistem Persuratan Online</b>
+    </div>
     <div class="container">
         <div class="sidebar">
             <h2>Admin Panel</h2>
@@ -216,8 +293,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
             </div>
 
+            <?php
+            // Tentukan jumlah surat per halaman
+            $limit = 5;
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+            $offset = ($page - 1) * $limit;
+
+            // Ambil data filter dari URL jika ada
+            $selected_bulan = isset($_GET['bulan']) ? $_GET['bulan'] : '';
+            $selected_tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '';
+
+            $where_clause = "";
+            if (!empty($selected_bulan) && !empty($selected_tahun)) {
+                $where_clause = "WHERE MONTH(tanggal_surat) = '$selected_bulan' AND YEAR(tanggal_surat) = '$selected_tahun'";
+            }
+
+            // Hitung total surat
+            $total_query = "SELECT COUNT(*) as total FROM surat_masuk $where_clause"; 
+            $total_result = $conn->query($total_query);
+            $total_row = $total_result->fetch_assoc();
+            $total_records = $total_row['total'];
+            $total_pages = ceil($total_records / $limit);
+
+            // Ambil data surat berdasarkan filter dan halaman
+            $query = "SELECT * FROM surat_masuk $where_clause LIMIT $limit OFFSET $offset";
+            $result = $conn->query($query);
+            ?>
+
             <div class="card table-container">
                 <h3>List Surat Masuk</h3>
+                <form method="GET" action="surat_masuk.php" class="filter-form">
+                    <label for="bulan">Bulan:</label>
+                    <select name="bulan" id="bulan">
+                        <option value="">-- Pilih Bulan --</option>
+                        <?php
+                        $bulan = [
+                            "01" => "Januari",
+                            "02" => "Februari",
+                            "03" => "Maret",
+                            "04" => "April",
+                            "05" => "Mei",
+                            "06" => "Juni",
+                            "07" => "Juli",
+                            "08" => "Agustus",
+                            "09" => "September",
+                            "10" => "Oktober",
+                            "11" => "November",
+                            "12" => "Desember"
+                        ];
+
+                        foreach ($bulan as $key => $value) {
+                            echo "<option value=\"$key\">$value</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <label for="tahun">Tahun:</label>
+                    <select name="tahun" id="tahun">
+                        <option value="">-- Pilih Tahun --</option>
+                        <?php
+                        $current_year = date("Y");
+                        for ($year = $current_year; $year >= 2000; $year--) {
+                            echo "<option value=\"$year\">$year</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <button type="submit">Filter</button>
+                </form>
+
                 <table>
                     <thead>
                         <tr>
@@ -250,6 +394,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                <div class="pagination">
+                    <?php
+                    $base_url = "?bulan=$selected_bulan&tahun=$selected_tahun";
+                    if ($page > 1): ?>
+                        <a href="<?= $base_url ?>&page=1">&laquo;</a>
+                        <a href="<?= $base_url ?>&page=<?= $page - 1; ?>">&lt;</a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="<?= $base_url ?>&page=<?= $i; ?>" <?= ($i == $page) ? 'class="active"' : ''; ?>><?= $i; ?></a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <a href="<?= $base_url ?>&page=<?= $page + 1; ?>">&gt;</a>
+                        <a href="<?= $base_url ?>&page=<?= $total_pages; ?>">&raquo;</a>
+                    <?php endif; ?>
+                </div>
+
             </div>
         </div>
     </div>

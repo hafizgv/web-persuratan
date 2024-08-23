@@ -2,42 +2,83 @@
 require_once '../vendor/autoload.php'; 
 require_once '../config/connection.php'; 
 
-// Periksa apakah jenis surat sudah dipilih
-if (!isset($_GET['type'])) {
-    die("Jenis surat tidak dipilih.");
+// Periksa apakah ID surat keterangan sudah diberikan
+if (!isset($_GET['id'])) {
+    die("ID surat keterangan tidak diberikan.");
 }
 
-$jenis_surat_id = $_GET['type'];
+$surat_keterangan_id = $_GET['id'];
 
-// Ambil data jenis surat dari database menggunakan id
-$query = "SELECT * FROM jenis_surat WHERE id = ?";
+// Ambil data surat keterangan dari database menggunakan id
+$query = "SELECT * FROM surat_keterangan WHERE id = ?";
 $stmt = mysqli_prepare($conn, $query);
 
 if (!$stmt) {
     die("Error preparing statement: " . mysqli_error($conn));
 }
 
-mysqli_stmt_bind_param($stmt, "i", $jenis_surat_id);
+mysqli_stmt_bind_param($stmt, "i", $surat_keterangan_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $surat = mysqli_fetch_assoc($result);
 
 if (!$surat) {
+    die("Surat keterangan tidak ditemukan.");
+}
+
+// Ambil data jenis surat
+$jenis_surat_id = $surat['jenis_surat_id'];
+$query = "SELECT * FROM jenis_surat WHERE id = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $jenis_surat_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$jenis_surat = mysqli_fetch_assoc($result);
+
+if (!$jenis_surat) {
     die("Jenis surat tidak ditemukan.");
 }
 
-$template_file = '../templates/' . $surat['template_file'];
-$required_fields = explode(',', $surat['required_fields']);
+$template_file = '../templates/' . $jenis_surat['template_file'];
+$required_fields = explode(',', $jenis_surat['required_fields']);
+
+// Ambil data yang sudah disimpan
+$data_query = "SELECT * FROM surat_keterangan_data WHERE surat_keterangan_id = ?";
+$data_stmt = mysqli_prepare($conn, $data_query);
+mysqli_stmt_bind_param($data_stmt, "i", $surat_keterangan_id);
+mysqli_stmt_execute($data_stmt);
+$data_result = mysqli_stmt_get_result($data_stmt);
+
+$formData = [];
+while ($row = mysqli_fetch_assoc($data_result)) {
+    $formData[$row['field_name']] = $row['field_value'];
+}
+
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $formData = [];
+    $newData = [];
     foreach ($required_fields as $field) {
-        $formData[$field] = $_POST[$field] ?? '';
+        $newData[$field] = $_POST[$field] ?? '';
     }
 
-    $data = $formData;
+    // Update data di database
+    foreach ($newData as $field_name => $field_value) {
+        $update_query = "UPDATE surat_keterangan_data SET field_value = ? WHERE surat_keterangan_id = ? AND field_name = ?";
+        $update_stmt = mysqli_prepare($conn, $update_query);
 
+        if (!$update_stmt) {
+            die("Error preparing update statement: " . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($update_stmt, "sis", $field_value, $surat_keterangan_id, $field_name);
+        if (!mysqli_stmt_execute($update_stmt)) {
+            die("Error executing update statement: " . mysqli_stmt_error($update_stmt));
+        }
+    }
+
+    $data = $newData;
+    // Generate PDF ulang jika diperlukan
     ob_start();
     include $template_file; 
     $html = ob_get_clean();
@@ -49,35 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $file_path = '../uploads/' . $filename;
     $mpdf->Output($file_path, \Mpdf\Output\Destination::FILE);
 
-    // Simpan informasi file ke database
-    $insert_query = "INSERT INTO surat_keterangan (jenis_surat_id, nama_surat, file_lampiran, created_at) VALUES (?, ?, ?, NOW())";
-    $stmt = mysqli_prepare($conn, $insert_query);
-
-    if (!$stmt) {
-        die("Error preparing insert statement: " . mysqli_error($conn));
-    }
-
-    mysqli_stmt_bind_param($stmt, "iss", $jenis_surat_id, $surat['nama_surat'], $file_path);
-    if (!mysqli_stmt_execute($stmt)) {
-        die("Error executing insert statement: " . mysqli_stmt_error($stmt));
-    }
-
-    $surat_keterangan_id = mysqli_insert_id($conn);
-
-    // Simpan data surat ke tabel surat_keterangan_data
-    foreach ($formData as $field_name => $field_value) {
-        $data_query = "INSERT INTO surat_keterangan_data (surat_keterangan_id, jenis_surat_id, field_name, field_value) VALUES (?, ?, ?, ?)";
-        $data_stmt = mysqli_prepare($conn, $data_query);
-
-        if (!$data_stmt) {
-            die("Error preparing data insert statement: " . mysqli_error($conn));
-        }
-
-        mysqli_stmt_bind_param($data_stmt, "iiss", $surat_keterangan_id, $jenis_surat_id, $field_name, $field_value);
-        if (!mysqli_stmt_execute($data_stmt)) {
-            die("Error executing data insert statement: " . mysqli_stmt_error($data_stmt));
-        }
-    }
+    // Update file lampiran di database
+    $update_file_query = "UPDATE surat_keterangan SET file_lampiran = ? WHERE id = ?";
+    $update_file_stmt = mysqli_prepare($conn, $update_file_query);
+    mysqli_stmt_bind_param($update_file_stmt, "si", $file_path, $surat_keterangan_id);
+    mysqli_stmt_execute($update_file_stmt);
 
     $success = true;
 }
@@ -88,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Surat - <?php echo htmlspecialchars($surat['nama_surat']); ?></title>
+    <title>Edit Surat Keterangan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -100,9 +117,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             height: 100vh;
             overflow: auto;
         }
+        .header {
+            background-color: #e0f2f1;
+            color: #004d40;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 24px;
+            position: fixed;
+            width: calc(100% - 250px); /* Mengurangi lebar sidebar */
+            top: 0;
+            left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
+            z-index: 500;
+            border-bottom: 2px solid #ccc;
+        }
         .container {
             display: flex;
             width: 100%;
+            margin-top: 60px;
         }
         .sidebar {
             width: 250px;
@@ -112,8 +143,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
+            bottom: 0;
             overflow-y: auto;
+            z-index: 1000;
+            border-right: 2px solid #ccc;
         }
         .sidebar h2 {
             color: #004d40;
@@ -135,6 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .content {
             margin-left: 295px;
+            margin-top: 20px;            
             padding: 20px;
             width: calc(100% - 270px);
             overflow-y: auto;
@@ -282,6 +316,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
+    <div class="header">
+        <b>Sistem Persuratan Online</b>
+    </div>
     <div class="container">
         <div class="sidebar">
             <h2>Admin Panel</h2>
@@ -295,55 +332,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div class="content">
             <div class="card">
-                <h3>Buat Surat - <?php echo htmlspecialchars($surat['nama_surat']); ?></h3>
+                <h2>Edit Surat - <?php echo htmlspecialchars($surat['nama_surat']); ?></h2>
 
                 <?php if ($success): ?>
                     <div class="success">
-                        <p>Surat berhasil dibuat!</p>
+                        <p>Surat berhasil diperbarui!</p>
                     </div>
                 <?php else: ?>
                     <form method="POST">
                         <?php foreach ($required_fields as $field): ?>
-                            <?php 
-                                // Pisahkan kata berdasarkan underscore
-                                $words = explode('_', $field);
-                                
-                                // Jika kata pertama adalah 'nik', ubah menjadi 'NIK'
-                                if (strtolower($words[0]) === 'nik') {
-                                    $words[0] = strtoupper($words[0]);
-                                } else {
-                                    // Jika bukan 'nik', kapitalisasi huruf pertama kata pertama
-                                    $words[0] = ucwords($words[0]);
-                                }
-                                
-                                // Kapitalisasi huruf pertama kata selanjutnya
-                                for ($i = 1; $i < count($words); $i++) {
-                                    $words[$i] = ucwords($words[$i]);
-                                }
-
-                                // Gabungkan kata-kata kembali menjadi label
-                                $label = implode(' ', $words);
-                                $input_type = 'text';
-                                $attributes = '';
-
-                                if (strpos($field, 'tanggal') !== false) {
-                                    $input_type = 'date';
-                                } elseif (strpos($field, 'nik') !== false) {
-                                    $attributes = 'maxlength="16" pattern="\d{16}"';
-                                } elseif ($field === 'jenis_kelamin') {
-                                    echo "<label for='{$field}'>{$label}:</label>";
-                                    echo "<select id='{$field}' name='{$field}' required>
-                                            <option value='Laki-laki'>Laki-laki</option>
-                                            <option value='Perempuan'>Perempuan</option>
-                                          </select>";
-                                    continue;
-                                }
-
-                                echo "<label for='{$field}'>{$label}:</label>";
-                                echo "<input type='{$input_type}' id='{$field}' name='{$field}' {$attributes} required>";
-                            ?>
+                            <label for="<?php echo $field; ?>">
+                                <?php echo ucwords(str_replace('_', ' ', $field)); ?>:
+                            </label>
+                            <input 
+                                type="text" 
+                                id="<?php echo $field; ?>" 
+                                name="<?php echo $field; ?>" 
+                                value="<?php echo htmlspecialchars($formData[$field] ?? ''); ?>" 
+                                required>
                         <?php endforeach; ?>
-                        <button type="submit">Buat Surat</button>
+                        <button type="submit">Perbarui Surat</button>
                     </form>
                 <?php endif; ?>
                 <div class="back-home">

@@ -41,25 +41,41 @@ mysqli_close($conn);
             height: 100vh; /* Full height for body */
             overflow: hidden; /* Prevent scrollbars */
         }
+        .header {
+            background-color: #e0f2f1;
+            color: #004d40;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 24px;
+            position: fixed;
+            width: calc(100% - 250px); /* Mengurangi lebar sidebar */
+            top: 0;
+            left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
+            z-index: 500;
+            border-bottom: 1px solid #ccc;
+        }
         .container {
             display: flex;
             width: 100%;
+            margin-top: 60px;
         }
         .sidebar {
             width: 250px;
-            background-color: #e0f2f1; /* Warna pastel untuk sidebar */
+            background-color: #e0f2f1;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            height: 100vh; /* Full height sidebar */
-            position: fixed; /* Fixed position to stay in place */
+            height: 100vh;
+            position: fixed;
             top: 0;
-            left: 0;
-            overflow-y: auto; /* Scroll if needed */
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid #ccc;
         }
         .sidebar h2 {
             color: #004d40; /* Warna teks sidebar */
             font-size: 24px;
             margin: 0;
+            margin-bottom: 5vh;
         }
         .sidebar a {
             display: block;
@@ -75,9 +91,11 @@ mysqli_close($conn);
             background-color: #b2dfdb; /* Warna pastel saat hover */
         }
         .content {
+            
             flex: 1;
             padding: 20px;
-            margin-left: 250px; /* Margin to align with sidebar */
+            margin-left: 295px;
+            margin-top: 20px;            
             display: flex;
             flex-wrap: wrap;
             justify-content: center; /* Center cards */
@@ -109,6 +127,9 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
+    <div class="header">
+        <b>Sistem Persuratan Online</b>
+    </div>
     <div class="container">
         <div class="sidebar">
             <h2>Admin Panel</h2>

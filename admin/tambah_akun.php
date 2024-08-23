@@ -32,9 +32,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             height: 100vh;
             overflow: auto;
         }
+        .header {
+            background-color: #e0f2f1;
+            color: #004d40;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 24px;
+            position: fixed;
+            width: calc(100% - 250px); /* Mengurangi lebar sidebar */
+            top: 0;
+            left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
+            z-index: 500;
+            border-bottom: 2px solid #ccc;
+        }
         .container {
             display: flex;
             width: 100%;
+            margin-top: 60px;
         }
         .sidebar {
             width: 250px;
@@ -44,13 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
+            bottom: 0;
             overflow-y: auto;
+            z-index: 1000;
+            border-right: 2px solid #ccc;
         }
         .sidebar h2 {
             color: #004d40;
             font-size: 24px;
-            margin: 0;
+            margin: 0 0 1.9rem 1rem;
         }
         .sidebar a {
             display: block;
@@ -67,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .content {
             margin-left: 295px;
+            margin-top: 20px;
             padding: 20px;
             width: calc(100% - 270px);
             overflow-y: auto;
@@ -92,7 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 5px;
         }
         .card form .form-group input,
-        .card form .form-group textarea {
+        .card form .form-group textarea,
+        .card form .form-group select {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -165,6 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
+    <div class="header">
+        <b>Sistem Persuratan Online</b>
+    </div>
     <div class="container">
         <div class="sidebar">
             <h2>Admin Panel</h2>
@@ -185,15 +206,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 <?php endif; ?>
                 <form method="POST">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                    <label for="role">Role:</label>
-                    <select id="role" name="role" required>
-                        <option value="admin">Admin</option>
-                        <option value="guest">Guest</option>
-                    </select>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select id="role" name="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
                     <button type="submit">Tambah Akun</button>
                 </form>
             </div>
