@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .sidebar h2 {
             color: #004d40;
             font-size: 24px;
-            margin: 0;
+            margin: 0 0 1.9rem 1rem;
         }
         .sidebar a {
             display: block;

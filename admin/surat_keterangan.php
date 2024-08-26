@@ -41,7 +41,7 @@ $result = $conn->query($sql);
             top: 0;
             left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
             z-index: 500;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 2px solid #ccc;
         }
         .container {
             display: flex;
@@ -52,13 +52,14 @@ $result = $conn->query($sql);
             width: 250px;
             background-color: #e0f2f1;
             padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             height: 100vh;
             position: fixed;
             top: 0;
             bottom: 0;
             overflow-y: auto;
             z-index: 1000;
-            border-right: 1px solid #ccc;
+            border-right: 2px solid #ccc;
         }
         .sidebar h2 {
             color: #004d40;

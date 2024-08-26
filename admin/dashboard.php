@@ -52,7 +52,7 @@ mysqli_close($conn);
             top: 0;
             left: 250px; /* Agar header dimulai dari ujung kanan sidebar */
             z-index: 500;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 2px solid #ccc;
         }
         .container {
             display: flex;
@@ -63,19 +63,19 @@ mysqli_close($conn);
             width: 250px;
             background-color: #e0f2f1;
             padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             height: 100vh;
             position: fixed;
             top: 0;
             bottom: 0;
             overflow-y: auto;
             z-index: 1000;
-            border-right: 1px solid #ccc;
+            border-right: 2px solid #ccc;
         }
         .sidebar h2 {
-            color: #004d40; /* Warna teks sidebar */
+            color: #004d40;
             font-size: 24px;
-            margin: 0;
-            margin-bottom: 5vh;
+            margin: 0 0 1.9rem 1rem;
         }
         .sidebar a {
             display: block;
@@ -88,7 +88,7 @@ mysqli_close($conn);
             transition: background-color 0.3s ease;
         }
         .sidebar a:hover {
-            background-color: #b2dfdb; /* Warna pastel saat hover */
+            background-color: #b2dfdb;
         }
         .content {
             
