@@ -98,7 +98,7 @@ $result = $conn->query($sql);
 </head>
 <body>
     <header>
-        <h1>Sistem Persuratan Online</h1>
+        <h1>Sistem Persuratan Online Gampong Beusa Seberang</h1>
         <div class="login-admin">
             <a href="auth/login.php">Login</a>
         </div>
