@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php'; 
-require_once 'config/connection.php'; 
+require_once '../vendor/autoload.php'; 
+require_once '../config/connection.php'; 
+
 
 // Periksa apakah jenis surat sudah dipilih
 if (!isset($_GET['type'])) {
@@ -21,7 +22,7 @@ if (!$surat) {
     die("Jenis surat tidak ditemukan.");
 }
 
-$template_file = 'templates/' . $surat['template_file'];
+$template_file = '../templates/' . $surat['template_file'];
 $required_fields = explode(',', $surat['required_fields']);
 $success = false;
 
@@ -43,11 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mpdf->WriteHTML($html);
 
     $filename = $surat['nama_surat'] . "_" . time() . ".pdf";
-    $file_path = 'uploads/' . $filename;
+    $file_path = '../uploads/' . $filename;
     $mpdf->Output($file_path, \Mpdf\Output\Destination::FILE);
-
-    // Adjust the file path for the database to be relative to the admin panel
-    $db_file_path = '../' . $file_path;
 
     // Simpan informasi file ke database
     $insert_query = "INSERT INTO surat_keterangan (jenis_surat_id, nama_surat, file_lampiran, created_at) VALUES (?, ?, ?, NOW())";
@@ -57,10 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Error preparing insert statement: " . mysqli_error($conn));
     }
 
-    mysqli_stmt_bind_param($stmt, "iss", $jenis_surat_id, $surat['nama_surat'], $db_file_path);
+    mysqli_stmt_bind_param($stmt, "iss", $jenis_surat_id, $surat['nama_surat'], $file_path);
     if (!mysqli_stmt_execute($stmt)) {
         die("Error executing insert statement: " . mysqli_stmt_error($stmt));
     }
+
     $surat_keterangan_id = mysqli_insert_id($conn);
 
     // Simpan data surat ke tabel surat_keterangan_data
@@ -281,7 +280,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </form>
         <?php endif; ?>
         <div class="back-home">
-            <a href="index.php">Kembali</a>
+            <a href="../index.php">Kembali</a>
         </div>
     </div>
 </div>

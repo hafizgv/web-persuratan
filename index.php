@@ -98,7 +98,7 @@ $result = $conn->query($sql);
 </head>
 <body>
     <header>
-        <h1>Website Pembuatan Surat Otomatis</h1>
+        <h1>Sistem Persuratan Online</h1>
         <div class="login-admin">
             <a href="auth/login.php">Login</a>
         </div>
@@ -108,13 +108,13 @@ $result = $conn->query($sql);
         <h2>Pilih Jenis Surat yang Ingin Anda Buat:</h2>
         <div class="container">
             <?php while($row = $result->fetch_assoc()): ?>
-                <a href="buat_surat.php?type=<?= $row['id'] ?>"><?= htmlspecialchars($row['nama_surat']) ?></a>
+                <a href="guest/buat_surat.php?type=<?= $row['id'] ?>"><?= htmlspecialchars($row['nama_surat']) ?></a>
             <?php endwhile; ?>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2024 Website Pembuatan Surat Otomatis</p>
+        <p>&copy; 2024 Sistem Persuratan Online</p>
     </footer>
 </body>
 </html>

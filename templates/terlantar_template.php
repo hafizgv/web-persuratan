@@ -28,7 +28,7 @@
     <hr style="height: 2pt; border: none; color: black;">
     <div>
         <span style="font-size: 12pt; text-decoration: underline;">
-            SURAT KETERANGAN BELUM MENIKAH
+            SURAT KETERANGAN TERLANTAR
         </span><br>
         <span>
             Nomor: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/
@@ -41,7 +41,7 @@
         <table style="margin-left: 22pt;">
             <tbody>
                 <tr>
-                    <td>Nama</td>
+                    <td style="width: 120pt;">Nama</td>
                     <td style="text-indent: 24pt;">:</td>
                     <td><?php echo htmlspecialchars($data['nama']); ?></td>
                 </tr>
@@ -56,25 +56,51 @@
                     <td><?php echo htmlspecialchars($data['tempat_lahir']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
                 </tr>
                 <tr>
+                    <td>Jenis Kelamin</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['jenis_kelamin']); ?></td>
+                </tr>
+                <tr>
+                    <td>Agama</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['agama']); ?></td>
+                </tr>
+                <tr>
                     <td>Pekerjaan</td>
                     <td style="text-indent: 24pt;">:</td>
                     <td><?php echo htmlspecialchars($data['pekerjaan']); ?></td>
                 </tr>
                 <tr>
-                    <td>Status Perkawinan</td>
+                    <td>Warganegara</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['status_perkawinan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['warganegara']); ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Alamat</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
                 </tr>
             </tbody>
         </table>
         <div style="margin-top: 8pt; text-indent: 24pt;">
-            Yang tersebut namanya adalah benar penduduk gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur  menurut 
-            pengamatan kami dan pengakuannya benar ianya <b>belum pernah Menikah (Lajang).</b>
+            Anak dari :
+        </div>
+        <table style="margin-left: 22pt;">
+            <tbody>
+                <tr>
+                    <td style="width: 120pt;">Nama Ayah</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['nama_ayah']); ?></td>
+                </tr>
+                <tr>
+                    <td>Nama Ibu</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['nama_ibu']); ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 8pt; text-indent: 24pt;">
+            Benar yang tersebut diatas adalah penduduk Gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur, dan ianya merupakan salah seorang anak terlantar yang telah terdata di Gampong kami.</div>
         </div>
         <div style="margin-top: 8pt; text-indent: 24pt;">
             Demikian surat keterangan ini kami buat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.

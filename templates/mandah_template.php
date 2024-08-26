@@ -28,7 +28,7 @@
     <hr style="height: 2pt; border: none; color: black;">
     <div>
         <span style="font-size: 12pt; text-decoration: underline;">
-            SURAT KETERANGAN BELUM MENIKAH
+            SURAT KETERANGAN MANDAH
         </span><br>
         <span>
             Nomor: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/
@@ -41,7 +41,7 @@
         <table style="margin-left: 22pt;">
             <tbody>
                 <tr>
-                    <td>Nama</td>
+                    <td style="width: 120pt;">Nama</td>
                     <td style="text-indent: 24pt;">:</td>
                     <td><?php echo htmlspecialchars($data['nama']); ?></td>
                 </tr>
@@ -56,6 +56,11 @@
                     <td><?php echo htmlspecialchars($data['tempat_lahir']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
                 </tr>
                 <tr>
+                    <td>Jenis Kelamin</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['jenis_kelamin']); ?></td>
+                </tr>
+                <tr>
                     <td>Pekerjaan</td>
                     <td style="text-indent: 24pt;">:</td>
                     <td><?php echo htmlspecialchars($data['pekerjaan']); ?></td>
@@ -68,14 +73,52 @@
                 <tr>
                     <td style="vertical-align: top;">Alamat</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
+                </tr>
+                <tr>
+                    <td>Nama Ayah</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['nama_ayah']); ?></td>
                 </tr>
             </tbody>
         </table>
         <div style="margin-top: 8pt; text-indent: 24pt;">
-            Yang tersebut namanya adalah benar penduduk gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur  menurut 
-            pengamatan kami dan pengakuannya benar ianya <b>belum pernah Menikah (Lajang).</b>
+            Yang tersebut namanya adalah benar penduduk Gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur yang telah kami beri izin Bepergian ke Alamat :
         </div>
+        <table style="margin-left: 22pt;">
+            <tbody>
+                <tr>
+                    <td style="width: 120pt;">Desa/Kel</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['desa_/_kelurahan']); ?></td>
+                </tr>
+                <tr>
+                    <td>Kecamatan</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['kecamatan']); ?></td>
+                </tr>
+                <tr>
+                    <td>Kabupaten/Kota</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['kabupaten_/_kota']); ?></td>
+                </tr>
+                <tr>
+                    <td>Provinsi</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['provinsi']); ?></td>
+                </tr>
+                <tr>
+                    <td>Tujuan Bepergian</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td><?php echo htmlspecialchars($data['status_perkawinan']); ?></td>
+                </tr>
+                <tr>
+                    <td>Berlaku</td>
+                    <td style="text-indent: 24pt;">:</td>
+                    <td>Enam (6) Bulan semenjak tanggal di surat ini Keluar.</td>
+                </tr>
+            </tbody>
+        </table>
         <div style="margin-top: 8pt; text-indent: 24pt;">
             Demikian surat keterangan ini kami buat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
         </div>

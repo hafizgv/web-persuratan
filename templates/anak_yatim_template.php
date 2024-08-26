@@ -53,7 +53,7 @@
                 <tr>
                     <td>Tempat/Tanggal Lahir</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['tempat']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
+                    <td><?php echo htmlspecialchars($data['tempat_lahir']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
                 </tr>
                 <tr>
                     <td>Pekerjaan</td>
