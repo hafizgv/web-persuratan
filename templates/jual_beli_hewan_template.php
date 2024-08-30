@@ -47,22 +47,22 @@
                     <td rowspan="5"></td>
                     <td style="width: 120pt;">Nama</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['nama']); ?></td>
+                    <td><?php echo htmlspecialchars($data['nama_pihak_pertama']); ?></td>
                 </tr>
                 <tr>
                     <td>Tempat/Tanggal Lahir</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['tempat_lahir']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
+                    <td><?php echo htmlspecialchars($data['tempat_lahir_pihak_pertama']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir_pihak_pertama']); ?></td>
                 </tr>
                 <tr>
                     <td>Pekerjaan</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['pekerjaan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['pekerjaan_pihak_pertama']); ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Alamat</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat_pihak_pertama']); ?></td>
                 </tr>
             </tbody>
         </table>
@@ -75,30 +75,30 @@
                     <td rowspan="5"></td>
                     <td style="width: 120pt;">Nama</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['nama']); ?></td>
+                    <td><?php echo htmlspecialchars($data['nama_pihak_kedua']); ?></td>
                 </tr>
                 <tr>
                     <td>Tempat/Tanggal Lahir</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['tempat_lahir']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir']); ?></td>
+                    <td><?php echo htmlspecialchars($data['tempat_lahir_pihak_kedua']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir_pihak_kedua']); ?></td>
                 </tr>
                 <tr>
                     <td>Pekerjaan</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['pekerjaan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['pekerjaan_pihak_kedua']); ?></td>
                 </tr>
                 <tr>
                     <td style="vertical-align: top;">Alamat</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat_pihak_kedua']); ?></td>
                 </tr>
             </tbody>
         </table>
         <div style="margin-top: 8pt; text-indent: 24pt;">
             Yang tersebut namanya diatas (Pihak Pertama) benar telah menjual <?php echo htmlspecialchars($data['jumlah_hewan']); ?> ekor <?php echo htmlspecialchars($data['nama_hewan']); ?>,
-             jenis kelamin <?php echo htmlspecialchars($data['kelamin_hewan']); ?>, warna bulu <?php echo htmlspecialchars($data['warna_bulu']); ?>, tanduk : <?php echo htmlspecialchars($data['tanduk']); ?>,
-             umur <?php echo htmlspecialchars($data['umur_hewan_huruf']); ?> (<?php echo htmlspecialchars($data['umur_hewan_kata']); ?>) tahun, tanda-tanda lain <?php echo htmlspecialchars($data['tanda-tanda_lain']); ?>,
-             pihak kedua. Dengan harga penjualan Rp.<?php echo htmlspecialchars($data['harga_angka']); ?> (<?php echo htmlspecialchars($data['harga_kata']); ?>).
+             jenis kelamin <?php echo htmlspecialchars($data['jenis_kelamin_hewan']); ?>, warna bulu <?php echo htmlspecialchars($data['warna_hewan']); ?>, tanduk : <?php echo htmlspecialchars($data['tanduk']); ?>,
+             umur <?php echo htmlspecialchars($data['umur_dalam_angka']); ?> (<?php echo htmlspecialchars($data['umur_dalam_kata']); ?>) tahun, tanda-tanda lain <?php echo htmlspecialchars($data['tanda-tanda_lain']); ?>,
+             pihak kedua. Dengan harga penjualan Rp.<?php echo htmlspecialchars($data['harga_dalam_angka']); ?> (<?php echo htmlspecialchars($data['harga_dalam_kata']); ?>).
         </div>
         <div style="margin-top: 8pt; text-indent: 24pt;">
             Demikian surat keterangan ini kami buat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
@@ -121,13 +121,13 @@
                     <td></td>
                 </tr>
                 <tr>
-                    <td>(<?php echo htmlspecialchars($data['nama2']); ?>)</td>
-                    <td>(<?php echo htmlspecialchars($data['nama1']); ?>)</td>
+                    <td>(<?php echo htmlspecialchars($data['nama_pihak_kedua']); ?>)</td>
+                    <td>(<?php echo htmlspecialchars($data['nama_pihak_pertama']); ?>)</td>
                 </tr>
                 <tr>
                     <td>
                         Saksi :<br>
-                        Kepala Dusun <?php echo htmlspecialchars($data['asal_kadus']); ?>
+                        Kepala Dusun <?php echo htmlspecialchars($data['asal_kepala_dusun']); ?>
                     </td>
                     <td rowspan="3" style="width: 30%;"></td>
                     <td>
@@ -140,7 +140,7 @@
                     <td></td>
                 </tr>
                 <tr>
-                    <td style="text-decoration: underline;"><?php echo htmlspecialchars($data['nama_kadus']); ?></td>
+                    <td style="text-decoration: underline;"><?php echo htmlspecialchars($data['nama_kepala_dusun']); ?></td>
                     <td style="text-decoration: underline;"><b>M. TAIB</b></td>
                 </tr>
             </tbody>

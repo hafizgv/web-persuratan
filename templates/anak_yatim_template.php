@@ -85,7 +85,7 @@
                 <tr>
                     <td style="vertical-align: top;">Alamat Orang Tua</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat_orang_tua']); ?></td>
                 </tr>
             </tbody>
         </table>

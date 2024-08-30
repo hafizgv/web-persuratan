@@ -79,11 +79,11 @@
             <tbody>
                 <tr>
                     <td style="width: 24pt; vertical-align: top;">-</td>
-                    <td style="text-indent: 24pt;"><?php echo htmlspecialchars($data['>>>>#<<<<']); ?> atas nama <?php echo htmlspecialchars($data['nama']); ?></td>
+                    <td style="text-indent: 24pt;"><?php echo htmlspecialchars($data['barang_hilang']); ?> atas nama <?php echo htmlspecialchars($data['nama']); ?></td>
                 </tr>
                 <tr>
                     <td style="width: 24pt; vertical-align: top;">-</td>
-                    <td style="text-indent: 24pt;"><?php echo htmlspecialchars($data['>>>>#<<<<']); ?></td>
+                    <td style="text-indent: 24pt;"><?php echo htmlspecialchars($data['alasan_hilang']); ?></td>
                 </tr>
             </tbody>
         </table>

@@ -90,27 +90,27 @@
                 <tr>
                     <td style="width: 120pt;">Desa/Kel</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['desa_/_kelurahan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['desa_/_kelurahan_tujuan']); ?></td>
                 </tr>
                 <tr>
                     <td>Kecamatan</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['kecamatan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['kecamatan_tujuan']); ?></td>
                 </tr>
                 <tr>
                     <td>Kabupaten/Kota</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['kabupaten_/_kota']); ?></td>
+                    <td><?php echo htmlspecialchars($data['kabupaten_/_kota_tujuan']); ?></td>
                 </tr>
                 <tr>
                     <td>Provinsi</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['provinsi']); ?></td>
+                    <td><?php echo htmlspecialchars($data['provinsi_tujuan']); ?></td>
                 </tr>
                 <tr>
                     <td>Tujuan Bepergian</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['status_perkawinan']); ?></td>
+                    <td><?php echo htmlspecialchars($data['tujuan_bepergian']); ?></td>
                 </tr>
                 <tr>
                     <td>Berlaku</td>

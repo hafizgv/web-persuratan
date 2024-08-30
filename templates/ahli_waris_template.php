@@ -95,7 +95,7 @@
                 <tr>
                     <td>Tempat/Tanggal Lahir</td>
                     <td style="text-indent: 24pt;">:</td>
-                    <td><?php echo htmlspecialchars($data['tempat_pewaris']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir_pewaris']); ?></td>
+                    <td><?php echo htmlspecialchars($data['tempat_lahir_pewaris']); ?>, <?php echo htmlspecialchars($data['tanggal_lahir_pewaris']); ?></td>
                 </tr>
                 <tr>
                     <td>Jenis Kelamin</td>
