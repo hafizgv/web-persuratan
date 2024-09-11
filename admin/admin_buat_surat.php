@@ -344,27 +344,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 $label = implode(' ', $words);
                                 $input_type = 'text';
                                 $attributes = '';
+                                $placeholder = ''; // Placeholder default kosong
 
                                 if (strpos($field, 'tanggal') !== false) {
                                     $input_type = 'date';
                                 } elseif (strpos($field, 'nik') !== false) {
                                     $attributes = 'maxlength="16" pattern="\d{16}"';
-                                } elseif ($field === 'jenis_kelamin') {
+                                } elseif (strpos($field, 'jenis_kelamin') !== false) {
                                     echo "<label for='{$field}'>{$label}:</label>";
                                     echo "<select id='{$field}' name='{$field}' required>
                                             <option value='Laki-laki'>Laki-laki</option>
                                             <option value='Perempuan'>Perempuan</option>
-                                          </select>";
+                                        </select>";
                                     continue;
+                                } elseif (strpos($field, 'dalam_angka') !== false) {
+                                    $placeholder = '30'; // Placeholder untuk 'dalam_angka'
+                                } elseif (strpos($field, 'dalam_kata') !== false) {
+                                    $placeholder = 'Tiga Puluh'; // Placeholder untuk 'dalam_kata'
                                 }
 
                                 echo "<label for='{$field}'>{$label}:</label>";
-                                echo "<input type='{$input_type}' id='{$field}' name='{$field}' {$attributes} required>";
+                                echo "<input type='{$input_type}' id='{$field}' name='{$field}' placeholder='{$placeholder}' {$attributes} required>";
                             ?>
                         <?php endforeach; ?>
                         <button type="submit">Buat Surat</button>
                     </form>
                 <?php endif; ?>
+
                 <div class="back-home">
                     <a href="surat_keterangan.php">Kembali</a>
                 </div>

@@ -100,7 +100,7 @@
             </tbody>
         </table>
         <div style="margin-top: 8pt; text-indent: 24pt;">
-            Benar yang tersebut diatas adalah penduduk Gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur, dan ianya merupakan salah seorang anak terlantar yang telah terdata di Gampong kami.</div>
+            Benar yang tersebut diatas adalah penduduk Gampong Beusa Seberang Kecamatan Peureulak Barat Kabupaten Aceh Timur, dan ianya merupakan salah seorang anak terlantar yang telah terdata di Gampong kami.
         </div>
         <div style="margin-top: 8pt; text-indent: 24pt;">
             Demikian surat keterangan ini kami buat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.

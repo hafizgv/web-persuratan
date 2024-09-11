@@ -112,9 +112,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td>Pihak Kedua</td>
                     <td rowspan="3" style="width: 30%;"></td>
-                    <td></td>
+                    <td>Pihak Pertama</td>
                 </tr>
                 <tr>
                     <td style="height: 80pt;"></td>

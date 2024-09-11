@@ -73,7 +73,7 @@
                 <tr>
                     <td style="vertical-align: top;">Alamat</td>
                     <td style="text-indent: 24pt; vertical-align: top;">:</td>
-                    <td rowspan="2"><?php echo htmlspecialchars($data['alamat']); ?></td>
+                    <td><?php echo htmlspecialchars($data['alamat']); ?></td>
                 </tr>
                 <tr>
                     <td>Nama Ayah</td>

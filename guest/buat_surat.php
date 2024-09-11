@@ -236,47 +236,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         <?php else: ?>
             <form method="POST">
-                <?php foreach ($required_fields as $field): ?>
-                    <?php 
-                        // Pisahkan kata berdasarkan underscore
-                        $words = explode('_', $field);
-                        
-                        // Jika kata pertama adalah 'nik', ubah menjadi 'NIK'
-                        if (strtolower($words[0]) === 'nik') {
-                            $words[0] = strtoupper($words[0]);
-                        } else {
-                            // Jika bukan 'nik', kapitalisasi huruf pertama kata pertama
-                            $words[0] = ucwords($words[0]);
-                        }
-                        
-                        // Kapitalisasi huruf pertama kata selanjutnya
-                        for ($i = 1; $i < count($words); $i++) {
-                            $words[$i] = ucwords($words[$i]);
-                        }
+                <?php if ($success): ?>
+                    <div class="success">
+                        <p>Surat berhasil dibuat!</p>
+                    </div>
+                <?php else: ?>
+                    <form method="POST">
+                        <?php foreach ($required_fields as $field): ?>
+                            <?php 
+                                // Pisahkan kata berdasarkan underscore
+                                $words = explode('_', $field);
+                                
+                                // Jika kata pertama adalah 'nik', ubah menjadi 'NIK'
+                                if (strtolower($words[0]) === 'nik') {
+                                    $words[0] = strtoupper($words[0]);
+                                } else {
+                                    // Jika bukan 'nik', kapitalisasi huruf pertama kata pertama
+                                    $words[0] = ucwords($words[0]);
+                                }
+                                
+                                // Kapitalisasi huruf pertama kata selanjutnya
+                                for ($i = 1; $i < count($words); $i++) {
+                                    $words[$i] = ucwords($words[$i]);
+                                }
 
-                        // Gabungkan kata-kata kembali menjadi label
-                        $label = implode(' ', $words);
-                        $input_type = 'text';
-                        $attributes = '';
+                                // Gabungkan kata-kata kembali menjadi label
+                                $label = implode(' ', $words);
+                                $input_type = 'text';
+                                $attributes = '';
+                                $placeholder = ''; // Placeholder default kosong
 
-                        if (strpos($field, 'tanggal') !== false) {
-                            $input_type = 'date';
-                        } elseif (strpos($field, 'nik') !== false) {
-                            $attributes = 'maxlength="16" pattern="\d{16}"';
-                        } elseif ($field === 'jenis_kelamin') {
-                            echo "<label for='{$field}'>{$label}:</label>";
-                            echo "<select id='{$field}' name='{$field}' required>
-                                    <option value='Laki-laki'>Laki-laki</option>
-                                    <option value='Perempuan'>Perempuan</option>
-                                    </select>";
-                            continue;
-                        }
+                                if (strpos($field, 'tanggal') !== false) {
+                                    $input_type = 'date';
+                                } elseif (strpos($field, 'nik') !== false) {
+                                    $attributes = 'maxlength="16" pattern="\d{16}"';
+                                } elseif (strpos($field, 'jenis_kelamin') !== false) {
+                                    echo "<label for='{$field}'>{$label}:</label>";
+                                    echo "<select id='{$field}' name='{$field}' required>
+                                            <option value='Laki-laki'>Laki-laki</option>
+                                            <option value='Perempuan'>Perempuan</option>
+                                        </select>";
+                                    continue;
+                                } elseif (strpos($field, 'dalam_angka') !== false) {
+                                    $placeholder = '30'; // Placeholder untuk 'dalam_angka'
+                                } elseif (strpos($field, 'dalam_kata') !== false) {
+                                    $placeholder = 'Tiga Puluh'; // Placeholder untuk 'dalam_kata'
+                                }
 
-                        echo "<label for='{$field}'>{$label}:</label>";
-                        echo "<input type='{$input_type}' id='{$field}' name='{$field}' {$attributes} required>";
-                    ?>
-                <?php endforeach; ?>
-                <button type="submit">Buat Surat</button>
+                                echo "<label for='{$field}'>{$label}:</label>";
+                                echo "<input type='{$input_type}' id='{$field}' name='{$field}' placeholder='{$placeholder}' {$attributes} required>";
+                            ?>
+                        <?php endforeach; ?>
+                        <button type="submit">Buat Surat</button>
+                    </form>
+                <?php endif; ?>
             </form>
         <?php endif; ?>
         <div class="back-home">
